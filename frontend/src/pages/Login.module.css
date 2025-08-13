@@ -1,59 +1,46 @@
-.loginContainer {
-  max-width: 400px;
-  width: 100%;
-  padding: 40px;
-  border: 1px solid #ddd;
-  border-radius: 15px;
-  background: rgb(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px); /* Desenfoque */
-  -webkit-backdrop-filter: blur(10px); /* Compatibilidad con Safari */
-  box-shadow: 0px 8px 32px rgba(0, 0, 0, 1);
-  color: #156e28;
-}
-
-.loginTitle {
-  text-align: center;
-  margin-bottom: 20px;
-  font-weight: 600px;
-  font-size: 24px;
-}
-
-.loginForm {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.loginInput {
-  width: 100%;
-  max-width: 350px;
-  padding: 10px 12px; /* Sin padding derecho extra */
-  font-size: 15px;
-  border: 1px solid #156e28;
-  border-radius: 8px;
+*{
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
-  margin-bottom: 15px;
 }
 
-.loginError {
-  color: #d32f2f;
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  /*background-color: brown;*/
+  background: url('/utp_2.jpg') no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.wrapper {
+  width: 420px;
+  background: transparent;
+  backdrop-filter: blur(10px); /* Desenfoque */
+  background: rgb(255, 255, 255, 0.5);
+  color: darkred;
+  border-radius: 10px;
+  padding: 30px 40px;
+}
+
+.wrapper h1 {
+  font-size: 36px;
   text-align: center;
-  margin-top: -8px;
-  margin-bottom: 10px;
-  font-weight: 500;
+  margin: 30px;
+}
+.input {
+  width: 100%;
+  max-width: 315px;
+  padding: 7px 7px; /* Sin padding derecho extra */
+  font-size: 15px;
+  border: 1px solid rgb(190, 186, 186);
+  border-radius: 5px;
+  box-sizing: border-box;
 }
 
-.loginButton {
-  padding: 10px;
-  background-color: #156e28;
-  color: white;
-  font-weight: bold;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.loginButton:hover {
-  background-color: #1bb63c;
+.input:focus {
+  border-color: darkred;
+  outline: none;
 }

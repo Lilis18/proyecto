@@ -47,16 +47,16 @@ const Login = ({ setIsAuthenticated }) => {
   };
 
   return (
-    <div className={styles.loginContainer}>
-      <h2 className={styles.loginTitle}>Iniciar Sesión</h2>
-      <form className={styles.loginForm} onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Correo"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          required
-          className={styles.loginInput}
+    <div className={styles.wrapper}>
+      <form onSubmit={handleLogin}>
+        <h1>Iniciar Sesión</h1>
+        <input 
+            type="email" 
+            placeholder='Correo'
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+            className={styles.input}
         />
         <InputPasswordConOjo
           placeholder="Contraseña"
@@ -65,8 +65,8 @@ const Login = ({ setIsAuthenticated }) => {
           required
           className={styles.loginInput}
         />
-        {error && <p className={styles.loginError}>{error}</p>}
-        <button type="submit" disabled={cargando} className={styles.loginButton}>
+        {error && <p>{error}</p>}
+        <button type="submit" disabled={cargando}>
           {cargando ? 'Ingresando...' : 'Ingresar'}
         </button>
       </form>
