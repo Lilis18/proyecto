@@ -7,6 +7,7 @@ import styles from './Dashboard.module.css';
 const Dashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('perfil');
+  const [menuVisible, setMenuVisible] = useState(false);
   const [selectedType, setSelectedType] = useState('');
   const [selectedSubType, setSelectedSubType] = useState('');
   const [resumen, setResumen] = useState('');
@@ -21,6 +22,11 @@ const Dashboard = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('nombre');
     navigate('/login');
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setMenuVisible(false); // Oculta el menú en móviles
   };
 
   const handlePeriodoChange = (index, campo, valor) => {
@@ -77,12 +83,14 @@ const Dashboard = () => {
       case 'perfil':
         return (
           <div>
-            <h2>Perfil del Usuario</h2>
+            <h2>Perfil</h2>
             <p>Nombre: {nombre}</p>
-            <button onClick={handleLogout}>Cerrar sesión</button>
-            <br />
-            <br />
-            <button onClick={() => navigate('/cambiar-contrasena')}>Cambiar Contraseña</button>
+            <button onClick={() => navigate('/cambiar-contrasena')} className={styles.botonSecundario}>Cambiar Contraseña</button>
+            <button 
+              className={`${styles.botonMenu} ${styles.botonSalir}`} 
+              onClick={handleLogout}>
+                Cerrar sesión
+            </button>
           </div>
         );
 
@@ -224,14 +232,29 @@ const Dashboard = () => {
 
   return (
     <div className={styles.contenedorDashboard}>
-      <div className={styles.menuLateral}>
-        <h3>Menú</h3>
-        <button className={styles.botonMenu} onClick={() => setActiveTab('perfil')}>Perfil</button>
-        <button className={styles.botonMenu} onClick={() => setActiveTab('cargar')}>Cargar Datos</button>
-        <button className={styles.botonMenu} onClick={() => setActiveTab('graficos')}>Visualizador de Gráficos</button>
-        <button className={styles.botonMenu} onClick={() => setActiveTab('edicion')}>Gestión de Datos</button>
-        <button className={`${styles.botonMenu} ${styles.botonSalir}`} onClick={handleLogout}>Cerrar sesión</button>
+      {/* Hamburguesa */}
+      <div className={styles.hamburguesa} onClick={() => setMenuVisible(!menuVisible)}>
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
+
+      {/* Menú */}
+      <div className={`${styles.menuLateral} ${menuVisible ? styles.mostrar : ''}`}>
+        <button className={`${styles.botonMenu} ${activeTab === 'perfil' ? styles.botonActivo : ''}`} onClick={() => handleTabChange('perfil')}>
+          Perfil
+        </button>
+        <button className={`${styles.botonMenu} ${activeTab === 'cargar' ? styles.botonActivo : ''}`} onClick={() => handleTabChange('cargar')}>
+          Cargar Datos
+        </button>
+        <button className={`${styles.botonMenu} ${activeTab === 'graficos' ? styles.botonActivo : ''}`} onClick={() => handleTabChange('graficos')}>
+          Visualizador de Gráficos
+        </button>
+        <button className={`${styles.botonMenu} ${activeTab === 'edicion' ? styles.botonActivo : ''}`} onClick={() => handleTabChange('edicion')}>
+          Gestión de Datos
+        </button>
+      </div>
+
       <div className={styles.contenidoPrincipal}>
         {renderContent()}
       </div>
