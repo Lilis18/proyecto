@@ -1,56 +1,101 @@
+/* Estilos base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: url('/utp_1.jpg') no-repeat center center fixed;
+  background-size: cover;
+  font-family: Arial, sans-serif;
+}
+
+/* Contenedor principal */
 .contenedor {
-  padding: 30px 50px;
-  max-width: 400px;
+  width: 420px;
   margin: 50px auto;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  color: darkred;
+  border-radius: 10px;
+  padding: 30px 40px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .titulo {
+  font-size: 28px;
   text-align: center;
-  margin-bottom: 20px;
-  color: #333;
+  margin-bottom: 25px;
 }
 
 .formulario {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 15px;
 }
 
-.boton {
-  padding: 10px;
-  background-color: #660404;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: background-color 0.3s ease;
-}
-
-.boton:hover {
-  background-color: #8b0000;
-}
-
-.botonSecundario {
-  padding: 10px;
-  background-color: #777;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 5px;
-  transition: background-color 0.3s ease;
-}
-
-.botonSecundario:hover {
-  background-color: #555;
+input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 15px;
+  width: 100%;
 }
 
 .error {
-  color: red;
+  color: darkred;
   text-align: center;
+  font-weight: 500;
+  margin-top: -5px;
+  margin-bottom: 10px;
+}
+
+.boton {
+  background-color: darkred;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.boton:hover {
+  background-color: #a00000;
+}
+
+.botonSecundario {
+  background-color: transparent;
+  color: darkred;
+  border: 2px solid darkred;
+  padding: 10px 18px;
+  border-radius: 5px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.botonSecundario:hover {
+  background-color: darkred;
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .contenedor {
+    width: 90%;
+    padding: 25px 20px;
+  }
+
+  .titulo {
+    font-size: 24px;
+  }
+
+  .boton,
+  .botonSecundario {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
 }

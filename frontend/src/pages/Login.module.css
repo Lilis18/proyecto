@@ -17,30 +17,114 @@ body {
 
 .wrapper {
   width: 420px;
-  background: transparent;
-  backdrop-filter: blur(10px); /* Desenfoque */
-  background: rgb(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
   color: darkred;
   border-radius: 10px;
   padding: 30px 40px;
+  margin: 50px auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .wrapper h1 {
   font-size: 36px;
   text-align: center;
-  margin: 30px;
-}
-.input {
-  width: 100%;
-  max-width: 315px;
-  padding: 7px 7px; /* Sin padding derecho extra */
-  font-size: 15px;
-  border: 1px solid rgb(190, 186, 186);
-  border-radius: 5px;
-  box-sizing: border-box;
+  margin-bottom: 30px;
 }
 
-.input:focus {
+.input,
+.loginInput {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid rgb(211, 205, 205);
+  border-radius: 5px;
+}
+
+.input:focus,
+.loginInput:focus {
   border-color: darkred;
   outline: none;
+}
+
+.loginError {
+  color: darkred;
+  text-align: center;
+  margin-top: -8px;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.loginRegister {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: #333; /* Color de texto ligeramente más oscuro para legibilidad */
+}
+
+.loginRegister a {
+  color: darkred;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.loginRegister a:hover {
+  color: #a00000; /* Un rojo más oscuro al pasar el mouse */
+  text-decoration: underline;
+}
+
+.loginButton {
+  width: 100%;
+  max-width: 315px;
+  padding: 10px;
+  background-color: darkred;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: auto;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.loginButton:hover {
+  background-color: #a00000; /* Un rojo más oscuro al pasar el mouse */
+  transform: scale(1.02); /* Efecto de aumento suave */
+}
+
+.loginButton:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  transform: none;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .wrapper {
+    width: 90%;
+    padding: 25px 20px;
+  }
+
+  .wrapper h1 {
+    font-size: 28px;
+  }
+
+  button {
+    font-size: 14px;
+  }
+
+  form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 }

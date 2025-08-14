@@ -65,8 +65,8 @@ const Login = ({ setIsAuthenticated }) => {
           required
           className={styles.loginInput}
         />
-        {error && <p>{error}</p>}
-        <button type="submit" disabled={cargando}>
+        {error && <p className={styles.loginError}>{error}</p>}
+        <button type="submit" disabled={cargando} className={styles.loginButton}>
           {cargando ? 'Ingresando...' : 'Ingresar'}
         </button>
       </form>

@@ -63,7 +63,7 @@ const CambiarContrasena = () => {
           onChange={e => setNuevaContrasena(e.target.value)}
         />
         <InputPasswordConOjo
-          placeholder="Confirmar nueva contraseña"
+          placeholder="Confirmar contraseña"
           value={confirmarContrasena}
           onChange={e => setConfirmarContrasena(e.target.value)}
         />

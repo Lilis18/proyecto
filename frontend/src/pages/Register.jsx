@@ -43,7 +43,7 @@ const Register = () => {
           value={name}
           onChange={e => setName(e.target.value)}
           required
-          className={styles.input}
+          className={styles.inputRegister}
         />
         <input
           type="email"
@@ -51,7 +51,7 @@ const Register = () => {
           value={email}
           onChange={e => setEmail(e.target.value)}
           required
-          className={styles.input}
+          className={styles.inputRegister}
         />
         <input
           type="password"
@@ -59,7 +59,7 @@ const Register = () => {
           value={password}
           onChange={e => setPassword(e.target.value)}
           required
-          className={styles.input}
+          className={styles.inputRegister}
         />
         {error && <p className={styles.error}>{error}</p>}
         <button type="submit" className={styles.boton}>Registrar</button>

@@ -9,13 +9,14 @@ const InputPasswordConOjo = ({ placeholder, value, onChange, required = true }) 
   return (
     <div className={styles.contenedor}>
       <input
-        type="text" // Siempre text para evitar cambio de tamaño
+        type="text"
         placeholder={placeholder}
         value={value}
         onChange={onChange}
         required={required}
-        className={`${styles.input} ${mostrar ? styles.mostrar : styles.ocultar}`}
+        className={`${styles.input} ${!mostrar ? styles.inputOculto : ''}`}
       />
+
       <button
         type="button"
         onClick={toggleMostrar}
