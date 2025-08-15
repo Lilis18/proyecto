@@ -1,55 +1,61 @@
-/* Estilos generales */
-body {
-  font-family: Arial, Helvetica, sans-serif;
-  margin: 0;
-  padding: 0;
+.contenedorGrafico {
+  width: 100%;
+  max-width: 650px;
+  height: 400px;
+  margin: 0 auto; /* Centra horizontalmente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  padding: 10px;
   box-sizing: border-box;
 }
 
-/* Contenedor de filtros */
+
 .filtros {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin: 15px 0;
+  gap: 6px; /* menos espacio */
+  margin-bottom: 10px;
 }
 
 .filtros select {
-  padding: 8px;
+  padding: 8px 10px;
+  border-radius: 5px;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  min-width: 150px;
-  background-color: #fff;
-  transition: border-color 0.3s ease;
+  background-color: white;
+  color: #333;
+  width: auto;
+  min-width: 120px;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-.filtros select:focus {
-  border-color: #660404;
-  outline: none;
-}
-
-/* Contenedor del gráfico */
-.contenedor-grafico {
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  padding: 15px;
-  border-radius: 8px;
+.btnExportar {
   margin-top: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Botón Exportar */
-.btn-exportar {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background-color: #660404;
-  color: #fff;
+  padding: 10px 16px;
+  background-color: darkred;
+  color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
 }
 
-.btn-exportar:hover {
-  background-color: #8b0000;
+.btnExportar:hover {
+  background-color: #a00000;
+}
+
+/* RESPONSIVE: para pantallas pequeñas (ej. móviles) */
+@media (max-width: 768px) {
+  .contenedorGrafico {
+    height: 300px; /* más bajo para móvil */
+  }
+}
+
+@media (max-width: 480px) {
+  .contenedorGrafico {
+    height: 250px; /* aún más bajo para pantallas muy pequeñas */
+  }
 }
