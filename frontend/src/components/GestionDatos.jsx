@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './GestionDatos.module.css'; // Asegúrate que la ruta sea correcta según tu proyecto
+import styles from './GestionDatos.module.css';
 
 const GestionDatos = () => {
   const [datos, setDatos] = useState([]);
@@ -147,50 +147,55 @@ const GestionDatos = () => {
   const subtiposDisponibles = subtiposPorTipo[tipo] || [];
 
   return (
-    <div>
+    <div className={styles.gestionContainer}>
       <h3>Gestión de Datos</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Tipo</th>
-            <th>Subtipo</th>
-            <th>Resumen</th>
-            <th>Indicador</th>
-            <th>Periodos</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {datos.map(dato => (
-            <tr key={dato._id}>
-              <td>{dato.tipo}</td>
-              <td>{dato.subtipo}</td>
-              <td>{dato.resumen}</td>
-              <td>{dato.indicador}</td>
-              <td>
-                {dato.periodos && dato.periodos.length > 0 ? (
-                  <ul>
-                    {dato.periodos.map((p, i) => (
-                      <li key={i}>
-                        {p.nombre}: {p.programado ?? 0} / {p.realizado ?? 0}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  'No hay periodos'
-                )}
-              </td>
-              <td>
-                <button onClick={() => eliminarDato(dato._id)}>Eliminar</button>
-                <button onClick={() => editarDato(dato)}>Editar</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
 
+      {/* === TABLA PRINCIPAL === */}
+      <div className={styles.tablaWrapper}>
+        <table className={styles.tabla}>
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Subtipo</th>
+              <th>Resumen</th>
+              <th>Indicador</th>
+              <th>Periodos</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {datos.map(dato => (
+              <tr key={dato._id}>
+                <td data-label="Tipo">{dato.tipo}</td>
+                <td data-label="Subtipo">{dato.subtipo}</td>
+                <td data-label="Resumen">{dato.resumen}</td>
+                <td data-label="Indicador">{dato.indicador}</td>
+                <td data-label="Periodos">
+                  {dato.periodos && dato.periodos.length > 0 ? (
+                    <ul className={styles.periodosLista}>
+                      {dato.periodos.map((p, i) => (
+                        <li key={i}>
+                          <strong>{p.nombre}:</strong>  
+                          <span data-label="Programado">{p.programado ?? 0}</span> / 
+                          <span data-label="Realizado">{p.realizado ?? 0}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : 'No hay periodos'}
+                </td>
+                <td className={styles.acciones}>
+                  <button onClick={() => eliminarDato(dato._id)}>Eliminar</button>
+                  <button onClick={() => editarDato(dato)}>Editar</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* === FORMULARIO DE EDICIÓN === */}
       {datoEditar && (
-        <div className="form-edicion">
+        <div className={styles.formEdicion}>
           <h4>Editando Registro</h4>
 
           <label>
@@ -235,44 +240,51 @@ const GestionDatos = () => {
           </label>
 
           <h5>Periodos</h5>
-          <table>
-            <thead>
-              <tr>
-                <th>Periodo</th>
-                <th>Programado</th>
-                <th>Realizado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {periodos.map((periodo, index) => {
-                const habilitado = esPeriodoHabilitado(extraerMesFinDeNombre(periodo.nombre));
-                return (
-                  <tr key={index}>
-                    <td>{periodo.nombre}</td>
-                    <td>
-                      <input
-                        type="number"
-                        value={periodo.programado}
-                        onChange={(e) => handlePeriodoChange(index, 'programado', e.target.value)}
-                        disabled={!habilitado}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        value={periodo.realizado}
-                        onChange={(e) => handlePeriodoChange(index, 'realizado', e.target.value)}
-                        disabled={!habilitado}
-                      />
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className={styles.tablaWrapper}>
+            <table className={styles.tabla}>
+              <thead>
+                <tr>
+                  <th>Periodo</th>
+                  <th>Programado</th>
+                  <th>Realizado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {periodos.map((periodo, index) => {
+                  const habilitado = esPeriodoHabilitado(extraerMesFinDeNombre(periodo.nombre));
+                  return (
+                    <tr key={index}>
+                      <td>{periodo.nombre}</td>
+                      <td data-label="Programado">
+                        <input
+                          type="number"
+                          value={periodo.programado}
+                          onChange={(e) => handlePeriodoChange(index, 'programado', e.target.value)}
+                          disabled={!habilitado}
+                        />
+                      </td>
+                      <td data-label="Realizado">
+                        <input
+                          type="number"
+                          value={periodo.realizado}
+                          onChange={(e) => handlePeriodoChange(index, 'realizado', e.target.value)}
+                          disabled={!habilitado}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
           <button onClick={actualizarDato}>Guardar Cambios</button>
-          <button onClick={() => setDatoEditar(null)}>Cancelar</button>
+          <button
+            className={styles.cancelar}
+            onClick={() => setDatoEditar(null)}
+          >
+            Cancelar
+          </button>
         </div>
       )}
     </div>

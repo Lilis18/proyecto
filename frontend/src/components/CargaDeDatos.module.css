@@ -1,0 +1,143 @@
+/* Inputs y selects */
+/* Formulario de edición */
+label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+input[type="text"], 
+input[type="number"], 
+select {
+  width: 100%;
+  padding: 6px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+input[disabled] {
+  background-color: #eee;
+}
+
+.inputResumen,
+.inputIndicador
+{
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.inputResumen:focus,
+.inputIndicador:focus {
+  border-color: darkred;
+  outline: none;
+  box-shadow: 0 0 4px rgba(164, 10, 10, 0.3);
+}
+
+/* Botón guardar */
+.botonGuardar {
+  background: darkred;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.botonGuardar:hover {
+  background: rgb(206, 13, 13);
+}
+
+/* === Tabla transparente con bordes visibles === */
+.tablaPeriodos {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background: transparent;
+}
+
+.tablaPeriodos th,
+.tablaPeriodos td {
+  border: 1px solid rgba(243, 243, 243, 0.488); /* Bordes sutiles */
+  padding: 10px;
+  text-align: center;
+  font-size: 14px;
+  background: transparent;
+  color: #fff; /* Usa #fff si tu dashboard es oscuro */
+}
+
+.tablaPeriodos th {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+/* Alternar filas sin afectar la transparencia */
+.tablaPeriodos tr:nth-child(even) {
+  background: transparent;
+}
+
+/* === Responsive para móviles === */
+@media (max-width: 768px) {
+  .tablaPeriodos,
+  .tablaPeriodos thead,
+  .tablaPeriodos tbody,
+  .tablaPeriodos th,
+  .tablaPeriodos td,
+  .tablaPeriodos tr {
+    display: block; /* Hace que cada fila sea un bloque */
+    width: 100%;
+  }
+
+  .tablaPeriodos thead {
+    display: none; /* Ocultamos los encabezados */
+  }
+
+  .tablaPeriodos tr {
+    margin-bottom: 15px;
+    border: 1px solid rgba(243, 243, 243, 0.488); /* Mantener borde visible */
+    border-radius: 10px;
+    padding: 10px;
+    background: transparent;
+  }
+
+  .tablaPeriodos td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: none;
+    border-bottom: 1px solid rgba(243, 243, 243, 0.488);
+    padding: 10px 5px;
+  }
+
+  .tablaPeriodos td:last-child {
+    border-bottom: none;
+  }
+
+  /* Pseudo-elementos para mostrar el título del campo */
+  .tablaPeriodos td::before {
+    content: attr(data-label); /* ← aquí se muestra el título */
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #fff;
+    flex: 1;
+  }
+  
+    .tablaPeriodos td input {
+    flex: 1;
+    margin-left: 10px;
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+  }
+}

@@ -1,0 +1,54 @@
+.evidencias-container {
+  font-family: 'Segoe UI', sans-serif;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.evidencias-container h2,
+.evidencias-container h3,
+.evidencias-container h4 {
+  color: #2c3e50;
+  margin-top: 20px;
+}
+
+.evidencias-container label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.evidencias-container input,
+.evidencias-container textarea {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.evidencias-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.evidencias-container table th,
+.evidencias-container table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.evidencias-container button {
+  background-color: #2980b9;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.evidencias-container button:hover {
+  background-color: #1f6391;
+}
