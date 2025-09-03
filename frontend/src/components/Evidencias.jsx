@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import styles from "./Evidencias.module.css";
 
 const EvidenciasFormato = () => {
   const componentRef = useRef();
@@ -22,7 +23,7 @@ const EvidenciasFormato = () => {
     nombrePP: "EDUCACIÓN SUPERIOR EN UNIVERSIDADES TECNOLÓGICAS",
     unidad: "DA2F",
     universidad: "UNIVERSIDAD TECNOLÓGICA DE PUEBLA",
-    tituloActividad: "Actividad 2.3 Promoción de acciones de igualdad",
+    tituloActividad: "",
   });
 
   // 🔹 Exportar a PDF
@@ -47,73 +48,44 @@ const EvidenciasFormato = () => {
   };
 
   return (
-    <div>
-      <h2>Captura de Evidencias</h2>
+     <div className={styles.contenedor}>
+      <h2 className={styles.tituloPrincipal}>Captura de Evidencias</h2>
 
-      {/* 🔹 Encabezado editable con etiquetas */}
-      <h3>Encabezado Editable</h3>
-      <div>
-        <label>Clave del PP: </label>
-        <input
-          value={encabezado.clavePP}
-          onChange={(e) =>
-            setEncabezado({ ...encabezado, clavePP: e.target.value })
-          }
-        />
-      </div>
-      <div>
-        <label>Nombre del PP: </label>
-        <input
-          value={encabezado.nombrePP}
-          onChange={(e) =>
-            setEncabezado({ ...encabezado, nombrePP: e.target.value })
-          }
-        />
-      </div>
-      <div>
-        <label>Unidad Responsable: </label>
-        <input
-          value={encabezado.unidad}
-          onChange={(e) =>
-            setEncabezado({ ...encabezado, unidad: e.target.value })
-          }
-        />
-      </div>
-      <div>
-        <label>Universidad: </label>
-        <input
-          value={encabezado.universidad}
-          onChange={(e) =>
-            setEncabezado({ ...encabezado, universidad: e.target.value })
-          }
-        />
-      </div>
-
-      <h3>Título de la actividad</h3>
-      <div>
-        <label>Título: </label>
-        <input
-          value={encabezado.tituloActividad}
-          onChange={(e) =>
-            setEncabezado({ ...encabezado, tituloActividad: e.target.value })
-          }
-        />
+      <h3 className={styles.subtitulo}>Encabezado Editable</h3>
+      <div className={styles.gridEncabezado}>
+        {["clavePP", "nombrePP", "unidad", "universidad", "tituloActividad"].map((campo) => (
+          <div
+            key={campo}
+            className={`${styles.columnaEncabezado} ${
+              campo === "tituloActividad" ? styles.columnaCompleta : ""
+            }`}
+          >
+            <label>
+              {campo === "clavePP"
+                ? "Clave del PP"
+                : campo === "nombrePP"
+                ? "Nombre del PP"
+                : campo === "unidad"
+                ? "Unidad Responsable"
+                : campo === "universidad"
+                ? "Universidad"
+                : "Título de la actividad"}:
+            </label>
+            <input
+              value={encabezado[campo]}
+              onChange={(e) =>
+                setEncabezado({ ...encabezado, [campo]: e.target.value })
+              }
+            />
+          </div>
+        ))}
       </div>
 
       {/* 🔹 TABLA DE CAPTURA */}
-      <h3>Metas Programadas y Alcanzadas</h3>
-      <table
-        border="1"
-        cellPadding="5"
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          textAlign: "center",
-          marginBottom: "20px",
-        }}
-      >
+      <h3 className={styles.subtitulo}>Metas Programadas y Alcanzadas</h3>
+      <table className={styles.tabla}>
         <thead>
-          <tr style={{ backgroundColor: "#e2e2e2" }}>
+          <tr>
             <th>Cuatrimestre</th>
             <th>Enero - Abril</th>
             <th>Mayo - Agosto</th>
@@ -123,92 +95,41 @@ const EvidenciasFormato = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td style={{ backgroundColor: "#a10e0e", color: "#fff" }}>Meta Programada</td>
-            <td>
-              <input
-                value={datos.prog.eneAbr}
-                onChange={(e) => handleChange("prog", "eneAbr", e.target.value)}
-              />
-            </td>
-            <td>
-              <input
-                value={datos.prog.mayAgo}
-                onChange={(e) => handleChange("prog", "mayAgo", e.target.value)}
-              />
-            </td>
-            <td>
-              <input
-                value={datos.prog.sepDic}
-                onChange={(e) => handleChange("prog", "sepDic", e.target.value)}
-              />
-            </td>
-            <td>
-              <input
-                value={datos.prog.total}
-                onChange={(e) => handleChange("prog", "total", e.target.value)}
-              />
-            </td>
-            <td>
-              <input
-                value={datos.prog.porcentaje}
-                onChange={(e) => handleChange("prog", "porcentaje", e.target.value)}
-              />
-            </td>
-          </tr>
-          <tr>
-            <td style={{ backgroundColor: "#a10e0e", color: "#fff" }}>Meta Alcanzada</td>
-            <td>
-              <input
-                value={datos.alc.eneAbr}
-                onChange={(e) => handleChange("alc", "eneAbr", e.target.value)}
-              />
-            </td>
-            <td>
-              <input
-                value={datos.alc.mayAgo}
-                onChange={(e) => handleChange("alc", "mayAgo", e.target.value)}
-              />
-            </td>
-            <td>
-              <input
-                value={datos.alc.sepDic}
-                onChange={(e) => handleChange("alc", "sepDic", e.target.value)}
-              />
-            </td>
-            <td>
-              <input
-                value={datos.alc.total}
-                onChange={(e) => handleChange("alc", "total", e.target.value)}
-              />
-            </td>
-            <td>
-              <input
-                value={datos.alc.porcentaje}
-                onChange={(e) => handleChange("alc", "porcentaje", e.target.value)}
-              />
-            </td>
-          </tr>
+          {["prog", "alc"].map((tipo) => (
+            <tr key={tipo}>
+              <td className={styles.filaTitulo}>
+                {tipo === "prog" ? "Meta Programada" : "Meta Alcanzada"}
+              </td>
+              {["eneAbr", "mayAgo", "sepDic", "total", "porcentaje"].map((campo) => (
+                <td key={campo}>
+                  <input
+                    value={datos[tipo][campo]}
+                    onChange={(e) => handleChange(tipo, campo, e.target.value)}
+                  />
+                </td>
+              ))}
+            </tr>
+          ))}
         </tbody>
       </table>
 
       {/* 🔹 Otros campos */}
-      <h3>Otros campos</h3>
-      <div>
+      <h3 className={styles.subtitulo}>Otros campos</h3>
+      <div className={styles.campo}>
         <label>Justificación: </label>
         <textarea
           value={datos.justificacion}
           onChange={(e) => setDatos({ ...datos, justificacion: e.target.value })}
         />
       </div>
-      <div>
+      <div className={styles.campo}>
         <label>Descripción: </label>
         <textarea
           value={datos.descripcion}
           onChange={(e) => setDatos({ ...datos, descripcion: e.target.value })}
         />
       </div>
-      <div>
+      <div className={styles.campo}>
         <label>Evidencias (una por línea): </label>
         <textarea
           value={datos.evidencias.join("\n")}
@@ -218,79 +139,69 @@ const EvidenciasFormato = () => {
         />
       </div>
 
-      <h3>Titular</h3>
-      <div>
-        <label>Nombre: </label>
-        <input
-          value={datos.titular.nombre}
-          onChange={(e) =>
-            setDatos({ ...datos, titular: { ...datos.titular, nombre: e.target.value } })
-          }
-        />
-        <label>Puesto: </label>
-        <input
-          value={datos.titular.puesto}
-          onChange={(e) =>
-            setDatos({ ...datos, titular: { ...datos.titular, puesto: e.target.value } })
-          }
-        />
+      <h3 className={styles.subtitulo}>Titular y Enlace</h3>
+      <div className={styles.filaDoble}>
+        <div className={styles.columna}>
+          <label>Nombre del Titular:</label>
+          <input
+            value={datos.titular.nombre}
+            onChange={(e) =>
+              setDatos({ ...datos, titular: { ...datos.titular, nombre: e.target.value } })
+            }
+          />
+          <label>Puesto del Titular:</label>
+          <input
+            value={datos.titular.puesto}
+            onChange={(e) =>
+              setDatos({ ...datos, titular: { ...datos.titular, puesto: e.target.value } })
+            }
+          />
+        </div>
+
+        <div className={styles.columna}>
+          <label>Nombre del Enlace:</label>
+          <input
+            value={datos.enlace.nombre}
+            onChange={(e) =>
+              setDatos({ ...datos, enlace: { ...datos.enlace, nombre: e.target.value } })
+            }
+          />
+          <label>Puesto del Enlace:</label>
+          <input
+            value={datos.enlace.puesto}
+            onChange={(e) =>
+              setDatos({ ...datos, enlace: { ...datos.enlace, puesto: e.target.value } })
+            }
+          />
+        </div>
       </div>
 
-      <h3>Enlace</h3>
-      <div>
-        <label>Nombre: </label>
-        <input
-          value={datos.enlace.nombre}
-          onChange={(e) =>
-            setDatos({ ...datos, enlace: { ...datos.enlace, nombre: e.target.value } })
-          }
-        />
-        <label>Puesto: </label>
-        <input
-          value={datos.enlace.puesto}
-          onChange={(e) =>
-            setDatos({ ...datos, enlace: { ...datos.enlace, puesto: e.target.value } })
-          }
-        />
-      </div>
-
-      <button onClick={exportarPDF}>Exportar PDF</button>
+      <button className={styles.botonExportar} onClick={exportarPDF}>
+        Exportar PDF
+      </button>
 
       {/* 🔹 Documento generado */}
-      <div
-        ref={componentRef}
-        style={{
-          fontFamily: "Arial",
-          padding: "20px",
-          backgroundColor: "#fff",
-          color: "#000",
-          width: "60%",
-        }}
-      >
+      <div ref={componentRef} className={styles.documento}>
         {/* 🔹 Membrete */}
-        <div style={{ textAlign: "right", marginBottom: "15px" }}>
+        <div className={styles.membrete}>
           <img
             src="/Membrete_UTP.jpg"
             alt="Membrete"
-            style={{ width: "250px", height: "auto" }}
+            className={styles.membreteImg}
           />
           {/* 🔹 Texto centrado editable con etiquetas reflejadas */}
-          <div style={{ textAlign: "center", marginTop: "10px", fontSize: "14px", lineHeight: "1.4" }}>
+          <div className={styles.textoCentrado}>
             <div>Clave y Nombre del PP: {encabezado.clavePP} {encabezado.nombrePP}</div>
             <div>Unidad Responsable: {encabezado.unidad} {encabezado.universidad}</div>
           </div>
         </div>
 
-        <h3 style={{ textAlign: "center" }}>Título de la actividad: {encabezado.tituloActividad}</h3>
+        <h3 className={styles.textoCentrado}>Título de la actividad: {encabezado.tituloActividad}</h3>
 
         {/* 🔹 Tabla reflejada en PDF */}
-        <table
-          border="1"
-          cellPadding="5"
-          style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}
-        >
+        <table className={styles.tabla}>
           <thead>
-            <tr style={{ backgroundColor: "#e2e2e2" }}>
+            <tr>
               <th>Cuatrimestre</th>
               <th>enero - abril</th>
               <th>mayo-agosto</th>
@@ -301,7 +212,7 @@ const EvidenciasFormato = () => {
           </thead>
           <tbody>
             <tr>
-              <td style={{ backgroundColor: "#a10e0e", color: "#fff" }}>Meta Programada</td>
+              <td className={styles.filaTitulo}>Meta Programada</td>
               <td>{datos.prog.eneAbr}</td>
               <td>{datos.prog.mayAgo}</td>
               <td>{datos.prog.sepDic}</td>
@@ -309,7 +220,7 @@ const EvidenciasFormato = () => {
               <td>{datos.prog.porcentaje}%</td>
             </tr>
             <tr>
-              <td style={{ backgroundColor: "#a10e0e", color: "#fff" }}>Meta Alcanzada</td>
+              <td className={styles.filaTitulo}>Meta Alcanzada</td>
               <td>{datos.alc.eneAbr}</td>
               <td>{datos.alc.mayAgo}</td>
               <td>{datos.alc.sepDic}</td>
@@ -320,27 +231,27 @@ const EvidenciasFormato = () => {
         </table>
 
         {/* Justificación */}
-        <h4 style={{ backgroundColor: "#a10e0e", color: "#fff", padding: "5px" }}>Justificación</h4>
-        <p style={{ minHeight: "50px", border: "1px solid #ccc", padding: "5px" }}>{datos.justificacion}</p>
+        <h4 className={styles.filaTitulo}>Justificación</h4>
+        <p className={styles.seccionTexto}>{datos.justificacion}</p>
 
         {/* Descripción */}
-        <h4 style={{ backgroundColor: "#a10e0e", color: "#fff", padding: "5px" }}>Descripción del beneficio institucional</h4>
-        <ul style={{ minHeight: "50px", border: "1px solid #ccc", padding: "5px" }}>
+        <h4 className={styles.filaTitulo}>Descripción del beneficio institucional</h4>
+        <ul className={styles.seccionTexto}>
           {datos.descripcion.split("\n").map((linea, i) => (
             <li key={i}>{linea}</li>
           ))}
         </ul>
 
         {/* Evidencias */}
-        <h4 style={{ backgroundColor: "#a10e0e", color: "#fff", padding: "5px" }}>Evidencias</h4>
-        <ol style={{ minHeight: "50px", border: "1px solid #ccc", padding: "5px" }}>
+        <h4 className={styles.filaTitulo}>Evidencias</h4>
+        <ol className={styles.seccionTexto}>
           {datos.evidencias.map((ev, i) => (
             <li key={i}>{ev}</li>
           ))}
         </ol>
 
         {/* Firmas */}
-        <table border="1" cellPadding="10" style={{ width: "100%", textAlign: "center", marginTop: "20px" }}>
+        <table  className={styles.tabla}>
           <tbody>
             <tr>
               <td>

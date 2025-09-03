@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  BarChart, Bar, XAxis, YAxis, Tooltip,
   Legend, ResponsiveContainer, LabelList
 } from 'recharts';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import styles from '../components/Grafico.module.css'; // ✅ Usa su propio archivo CSS Module
+import styles from '../components/Grafico.module.css';
 
 const Grafico = ({ tipoFiltro = '', subtipoFiltro = '' }) => {
   const [datos, setDatos] = useState([]);
   const [filtroTipo, setFiltroTipo] = useState(tipoFiltro);
   const [filtroSubtipo, setFiltroSubtipo] = useState(subtipoFiltro);
+  const [filtroPeriodo, setFiltroPeriodo] = useState(''); //Estado para el periodo
 
   useEffect(() => {
     const fetchDatos = async () => {
@@ -20,7 +21,14 @@ const Grafico = ({ tipoFiltro = '', subtipoFiltro = '' }) => {
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await response.json();
-        setDatos(data);
+        // Normaliza periodos
+        const datosNormalizados = data.map(dato => ({
+          ...dato,
+          periodos: dato.periodos || []
+        }));
+
+        setDatos(datosNormalizados);
+
       } catch (error) {
         console.error('Error al obtener los datos:', error);
       }
@@ -29,6 +37,12 @@ const Grafico = ({ tipoFiltro = '', subtipoFiltro = '' }) => {
     fetchDatos();
   }, []);
 
+  //Función que devuelve true si el perido está dentro del rango seleccionado
+  const periodoEnRango = (nombrePeriodo) => {
+    if (!filtroPeriodo) return true; // Si no hay filtro, pasa todo
+    return nombrePeriodo === filtroPeriodo;
+  };
+
   const filtrados = datos.filter(dato => {
     if (filtroTipo && dato.tipo !== filtroTipo) return false;
     if (filtroSubtipo && dato.subtipo !== filtroSubtipo) return false;
@@ -36,19 +50,31 @@ const Grafico = ({ tipoFiltro = '', subtipoFiltro = '' }) => {
   });
 
   const datosGrafico = filtrados.map(dato => {
-    const totalProgramado = dato.periodos.reduce((sum, p) => sum + (Number(p.programado) || 0), 0);
-    const totalRealizado = dato.periodos.reduce((sum, p) => sum + (Number(p.realizado) || 0), 0);
+    
+    //Aqui se filtra los periodos dentro del rango seleccionado
+    const periodosFiltrados = (dato.periodos || []).filter(p => periodoEnRango(p.nombre));
+
+    if (periodosFiltrados.length === 0) {
+      return null; //Un objeto con valores 0
+    }
+    const totalProgramado = periodosFiltrados.reduce((sum, p) => sum + (Number(p.programado) || 0), 0);
+    const totalRealizado = periodosFiltrados.reduce((sum, p) => sum + (Number(p.realizado) || 0), 0);
+    
+    console.log('🟡 Periodos sin filtrar:', dato.periodos);
+    console.log('🔍 Filtro aplicado:', filtroPeriodo);
+
     return {
       nombre: dato.subtipo || dato.tipo,
       Programado: totalProgramado,
       Realizado: totalRealizado
     };
-  });
+  }).filter(Boolean); //Elimina los null
 
   const exportarPDF = () => {
   const input = document.getElementById('grafico');
   const tipo = filtroTipo || 'Todos';
   const subtipo = filtroSubtipo || 'Todos';
+  const perido = filtroPeriodo || 'Todos';
 
   html2canvas(input, { scale: 2 }).then(canvas => {
     const imgData = canvas.toDataURL('image/png');
@@ -82,6 +108,7 @@ const Grafico = ({ tipoFiltro = '', subtipoFiltro = '' }) => {
     if (filtroSubtipo) {
       pdf.text(`Subtipo: ${subtipo}`, 10, 52);
     }
+    pdf.text(`Periodo: ${perido}`, 10, 59);
 
     // 🔹 Gráfico más abajo
     const graficoTop = filtroSubtipo ? 60 : 55;
@@ -90,13 +117,14 @@ const Grafico = ({ tipoFiltro = '', subtipoFiltro = '' }) => {
 
     pdf.addImage(imgData, 'PNG', 10, graficoTop, imgWidth, imgHeight);
 
-    pdf.save('grafico.pdf');
+    pdf.save('Avance.pdf');
   });
 };
 
   return (
     <div>
       <div className={styles.filtros}>
+        
         <select value={filtroTipo} onChange={(e) => { setFiltroTipo(e.target.value); setFiltroSubtipo(''); }}>
           <option value="">Todos</option>
           <option value="fin">Fin</option>
@@ -122,9 +150,29 @@ const Grafico = ({ tipoFiltro = '', subtipoFiltro = '' }) => {
             <option value="Actividad 1.1">Actividad 1.1</option>
             <option value="Actividad 1.2">Actividad 1.2</option>
             <option value="Actividad 1.3">Actividad 1.3</option>
+            <option value="Actividad 2.1">Actividad 2.1</option>
+            <option value="Actividad 2.2">Actividad 2.2</option>
+            <option value="Actividad 2.3">Actividad 2.3</option>
+            <option value="Actividad 3.1">Actividad 3.1</option>
+            <option value="Actividad 3.2">Actividad 3.2</option>
+            <option value="Actividad 3.3">Actividad 3.3</option>
+            <option value="Actividad 4.1">Actividad 4.1</option>
+            <option value="Actividad 4.2">Actividad 4.2</option>
+            <option value="Actividad 4.3">Actividad 4.3</option>
+            <option value="Actividad 5.1">Actividad 5.1</option>
+            <option value="Actividad 5.2">Actividad 5.2</option>
+            <option value="Actividad 5.3">Actividad 5.3</option>
             {/* Agrega más según necesites */}
           </select>
         )}
+
+        {/* NUEVO filtro de periodo */}
+        < select value={filtroPeriodo} onChange={(e) => setFiltroPeriodo(e.target.value)}>
+          <option value="">Todos los periodos</option>
+          <option value="Enero - Abril">Enero - Abril</option>
+          <option value="Mayo - Agosto">Mayo - Agosto</option>
+          <option value="Septiembre - Diciembre">Septiembre - Diciembre</option>
+        </select>
       </div>
 
       <div
