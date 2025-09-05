@@ -14,7 +14,11 @@ const protect = async (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
-        req.usuarioId = decoded.id; // para que tu ruta de guardar lo reciba correctamente
+        req.user = {
+            id: decoded.id,
+            role: decoded.role,
+        };// para que tu ruta de guardar lo reciba correctamente
+        
         next();
     } catch (error) {
         console.error('Error al verificar token:', error);
