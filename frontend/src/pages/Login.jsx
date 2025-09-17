@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import InputPasswordConOjo from '../components/InputPasswordConOjo';
 import styles from './Login.module.css';
+import { useAuth } from '../hooks/useAuth';
 
 const Login = ({ setIsAuthenticated }) => {
+  const { login } = useAuth(); // 👈 Hook de autenticación
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -31,8 +33,7 @@ const Login = ({ setIsAuthenticated }) => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('nombre', data.nombre);
+        login(data); // 👈 usamos el hook (guarda token, nombre, role en localStorage + estado)
         setIsAuthenticated(true);
         navigate('/dashboard');
       } else {
@@ -52,7 +53,7 @@ const Login = ({ setIsAuthenticated }) => {
         <h1>Iniciar Sesión</h1>
         <input 
             type="email" 
-            placeholder='Correo'
+            placeholder="Correo"
             value={email}
             onChange={e => setEmail(e.target.value)}
             required
@@ -70,9 +71,6 @@ const Login = ({ setIsAuthenticated }) => {
           {cargando ? 'Ingresando...' : 'Ingresar'}
         </button>
       </form>
-      <p className={styles.loginRegister}>
-        ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
-      </p>
     </div>
   );
 };

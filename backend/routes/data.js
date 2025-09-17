@@ -7,7 +7,7 @@ const { protect } = require('../middleware/authMiddleware'); // Middleware para 
 router.post('/guardar', protect, async (req, res) => {
   try {
     const nuevoDato = new Data({
-      usuario: req.usuarioId,
+      usuario: req.user.id,
       tipo: req.body.tipo,
       subtipo: req.body.subtipo,
       resumen: req.body.resumen,

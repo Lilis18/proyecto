@@ -13,8 +13,10 @@ router.post('/register', async (req, res) => {
 
   try {
     const userExists = await User.findOne({ email });
-    if (userExists) return res.status(400).json({ msg: 'El usuario ya existe' });
-
+    if (userExists) {
+      return res.status(400).json({ msg: 'El usuario ya existe' });
+    }
+      
     // Contar cuántos usuarios existen
     const count = await User.countDocuments();
 
@@ -47,8 +49,8 @@ router.post('/register', async (req, res) => {
       role: newUser.role,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: 'Error en el registro' });
+    console.error("❌ Error en /register:", error);
+    res.status(500).json({ msg: 'Error en el registro', error: error.message });
   }
 });
 
@@ -107,6 +109,76 @@ router.put('/cambiar-contrasena', protect, async (req, res) => {
         console.error('Error al actualizar la contraseña:', error);
         res.status(500).json({ msg: 'Error al actualizar la contraseña' });
     }
+});
+
+
+// Middleware extra: permitir solo SUPER_ADMIN
+const onlySuperAdmin = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.usuarioId);
+    if (!user || user.role !== "SUPER_ADMIN") {
+      return res.status(403).json({ msg: "No autorizado - Solo SUPER_ADMIN" });
+    }
+    next();
+  } catch (error) {
+    res.status(500).json({ msg: "Error en validación de permisos" });
+  }
+};
+
+// 🔹 Listar todos los usuarios
+router.get("/users", protect, onlySuperAdmin, async (req, res) => {
+  try {
+    const users = await User.find({}, "name email role createdAt");
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ msg: "Error al obtener usuarios" });
+  }
+});
+
+// 🔹 Cambiar rol de usuario
+router.put("/users/:id/role", protect, onlySuperAdmin, async (req, res) => {
+  const { role } = req.body;
+  if (!["ADMIN", "USER"].includes(role)) {
+    return res.status(400).json({ msg: "Rol no válido" });
+  }
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ msg: "Usuario no encontrado" });
+
+    user.role = role;
+    await user.save();
+    res.json({ msg: `Rol actualizado a ${role}`, user });
+  } catch (error) {
+    res.status(500).json({ msg: "Error al actualizar rol" });
+  }
+});
+
+// 🔹 Eliminar usuario
+router.delete("/users/:id", protect, onlySuperAdmin, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ msg: "Usuario eliminado correctamente" });
+  } catch (error) {
+    res.status(500).json({ msg: "Error al eliminar usuario" });
+  }
+});
+
+// 🔹 Habilitar / deshabilitar periodos
+router.put("/periods", protect, onlySuperAdmin, async (req, res) => {
+  try {
+    let settings = await AppSettings.findOne();
+    if (!settings) {
+      return res.status(404).json({ msg: "AppSettings no encontrado" });
+    }
+
+    settings.periodsOpen = req.body.periodsOpen;
+    await settings.save();
+
+    res.json({ msg: "Periodos actualizados", periodsOpen: settings.periodsOpen });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error al actualizar periodos" });
+  }
 });
 
 module.exports = router;

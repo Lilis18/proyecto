@@ -47,7 +47,7 @@ body {
 /* Inputs, igual que loginInput e input */
 .inputRegister {
   width: 100%;
-  max-width: 315px;
+  max-width: 415px;
   padding: 8px;
   font-size: 16px;
   border: 1px solid rgb(211, 205, 205);
@@ -98,24 +98,22 @@ body {
   transform: none;
 }
 
-/* Texto con enlace */
-.texto {
-  margin-top: 20px;
-  text-align: center;
-  font-size: 14px;
-  color: #333;
-}
-
-.link {
+.botonSecundario {
+  background-color: transparent;
   color: darkred;
-  text-decoration: none;
-  font-weight: bold;
-  transition: color 0.3s ease;
+  border: 2px solid darkred;
+  padding: 10px 120px;
+  border-radius: 5px;
+  font-size: 15px;
+  cursor: pointer;
+  margin-left: 5%;
+  margin-top: 2%;
+  transition: all 0.2s ease;
 }
 
-.link:hover {
-  color: #a00000;
-  text-decoration: underline;
+.botonSecundario:hover {
+  background-color: darkred;
+  color: white;
 }
 
 /* Responsive */

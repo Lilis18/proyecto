@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import styles from './Register.module.css';
+import InputPasswordConOjo from '../components/InputPasswordConOjo';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -53,20 +54,19 @@ const Register = () => {
           required
           className={styles.inputRegister}
         />
-        <input
-          type="password"
+        <InputPasswordConOjo
           placeholder="Contraseña"
           value={password}
           onChange={e => setPassword(e.target.value)}
           required
-          className={styles.inputRegister}
+          className={styles.loginInput}
         />
         {error && <p className={styles.error}>{error}</p>}
         <button type="submit" className={styles.boton}>Registrar</button>
       </form>
-      <p className={styles.texto}>
-        ¿Ya tienes cuenta? <Link to="/login" className={styles.link}>Inicia sesión</Link>
-      </p>
+      <button type="button" className={styles.botonSecundario} onClick={() => navigate('/dashboard')}>
+        Regresar
+      </button>
     </div>
   );
 };
