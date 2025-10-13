@@ -186,15 +186,15 @@ const Grafico = ({ tipoFiltro = '', subtipoFiltro = '' }) => {
             margin={{ top: 10, right: 10, left: 10, bottom: 10 }} // Reduce márgenes
           >
             {/* <CartesianGrid strokeDasharray="3 3" />   Es para las lineas de de cuadricula */}
-            <XAxis dataKey="nombre" stroke="#000000ff" />
-            <YAxis stroke="#000000ff" />
+            <XAxis dataKey="nombre" stroke="#ffffff" />
+            <YAxis stroke="#ffffff" />
             <Tooltip />
             <Legend verticalAlign="top" height={36} />
             <Bar dataKey="Programado" fill="#660404">
-              <LabelList dataKey="Programado" position="top" fill="#000000" />
+              <LabelList dataKey="Programado" position="top" fill="#ffffff" />
             </Bar>
             <Bar dataKey="Realizado" fill="#636161">
-              <LabelList dataKey="Realizado" position="top" fill="#000000" />
+              <LabelList dataKey="Realizado" position="top" fill="#ffffff" />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
