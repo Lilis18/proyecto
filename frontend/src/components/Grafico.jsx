@@ -7,11 +7,38 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import styles from '../components/Grafico.module.css';
 
+const periodosOpciones = [
+  'Enero - Abril',
+  'Mayo - Agosto',
+  'Septiembre - Diciembre',
+];
+
+const componentesOpciones = [
+  'Componente 1',
+  'Componente 2',
+  'Componente 3',
+  'Componente 4',
+  'Componente 5',
+]
+
+const actividadesOpciones = [
+  { group: 1, items: ['Actividad 1.1', 'Actividad 1.2', 'Actividad 1.3']},
+  { group: 2, items: ['Actividad 2.1', 'Actividad 2.2', 'Actividad 2.3']},
+  { group: 3, items: ['Actividad 3.1', 'Actividad 3.2', 'Actividad 3.3']},
+  { group: 4, items: ['Actividad 4.1', 'Actividad 4.2', 'Actividad 4.3']},
+  { group: 5, items: ['Actividad 5.1', 'Actividad 5.2', 'Actividad 5.3']},
+]
+
 const Grafico = ({ tipoFiltro = '', subtipoFiltro = '' }) => {
-  const [datos, setDatos] = useState([]);
-  const [filtroTipo, setFiltroTipo] = useState(tipoFiltro);
-  const [filtroSubtipo, setFiltroSubtipo] = useState(subtipoFiltro);
-  const [filtroPeriodo, setFiltroPeriodo] = useState(''); //Estado para el periodo
+  const [datos, setDatos] = useState([]); //Estado de datos completos
+  const [periodoFin, setPeriodoFin] = useState(''); //Estados filtro FIN
+  const [periodoProposito, setPeriodoProposito] = useState(''); //Estados filtro PROPÓSITO
+  //Estados filtros COMPONENTE
+  const [componenteSeleccionado, setComponenteSeleccionado] = useState(''); 
+  const [periodoComponente, setPeriodoComponente] = useState('');
+  // Estados filtros ACTIVIDAD
+  const [actividadSeleccionada, setActividadSeleccionada] = useState('');
+  const [periodoActividad, setPeriodoActividad] = useState('');
 
   useEffect(() => {
     const fetchDatos = async () => {
@@ -38,43 +65,75 @@ const Grafico = ({ tipoFiltro = '', subtipoFiltro = '' }) => {
   }, []);
 
   //Función que devuelve true si el perido está dentro del rango seleccionado
-  const periodoEnRango = (nombrePeriodo) => {
+  const periodoEnRango = (nombrePeriodo, filtroPeriodo) => {
     if (!filtroPeriodo) return true; // Si no hay filtro, pasa todo
     return nombrePeriodo === filtroPeriodo;
   };
 
-  const filtrados = datos.filter(dato => {
-    if (filtroTipo && dato.tipo !== filtroTipo) return false;
-    if (filtroSubtipo && dato.subtipo !== filtroSubtipo) return false;
-    return true;
-  });
+  // FILTROS y cálculo para FIN
+  const datosFin = datos
+    .filter(dato => dato.tipo === 'fin')
+    .map(dato => {
+      const periodosFiltrados = dato.periodos.filter(p => periodoEnRango(p.nombre, periodoFin));
+      if (periodosFiltrados.length === 0) return null;
+      const totalProgramado = periodosFiltrados.reduce((sum, p) => sum + (Number(p.programado) || 0), 0);
+      const totalRealizado = periodosFiltrados.reduce((sum, p) => sum + (Number(p.realizado) || 0), 0);
+      return {
+        nombre: dato.subtipo || dato.tipo,
+        Programado: totalProgramado,
+        Realizado: totalRealizado,
+      };
+    }).filter(Boolean);
 
-  const datosGrafico = filtrados.map(dato => {
-    
-    //Aqui se filtra los periodos dentro del rango seleccionado
-    const periodosFiltrados = (dato.periodos || []).filter(p => periodoEnRango(p.nombre));
+  // FILTROS y cálculo para PROPOSITO
+  const datosProposito = datos
+    .filter(dato => dato.tipo === 'proposito')
+    .map(dato => {
+      const periodosFiltrados = dato.periodos.filter(p => periodoEnRango(p.nombre, periodoProposito));
+      if (periodosFiltrados.length === 0) return null;
+      const totalProgramado = periodosFiltrados.reduce((sum, p) => sum + (Number(p.programado) || 0), 0);
+      const totalRealizado = periodosFiltrados.reduce((sum, p) => sum + (Number(p.realizado) || 0), 0);
+      return {
+        nombre: dato.subtipo || dato.tipo,
+        Programado: totalProgramado,
+        Realizado: totalRealizado,
+      };
+    }).filter(Boolean);
 
-    if (periodosFiltrados.length === 0) {
-      return null; //Un objeto con valores 0
-    }
-    const totalProgramado = periodosFiltrados.reduce((sum, p) => sum + (Number(p.programado) || 0), 0);
-    const totalRealizado = periodosFiltrados.reduce((sum, p) => sum + (Number(p.realizado) || 0), 0);
-    
-    console.log('🟡 Periodos sin filtrar:', dato.periodos);
-    console.log('🔍 Filtro aplicado:', filtroPeriodo);
+  // FILTROS y cálculo para COMPONENTES
+  const datosComponentes = datos
+    .filter(dato => dato.tipo === 'componente')
+    .filter(dato => !componenteSeleccionado || dato.subtipo === componenteSeleccionado)
+    .map(dato => {
+      const periodosFiltrados = dato.periodos.filter(p => periodoEnRango(p.nombre, periodoComponente));
+      if (periodosFiltrados.length === 0) return null;
+      const totalProgramado = periodosFiltrados.reduce((sum, p) => sum + (Number(p.programado) || 0), 0);
+      const totalRealizado = periodosFiltrados.reduce((sum, p) => sum + (Number(p.realizado) || 0), 0);
+      return {
+        nombre: dato.subtipo || dato.tipo,
+        Programado: totalProgramado,
+        Realizado: totalRealizado,
+      };
+    }).filter(Boolean);
 
-    return {
-      nombre: dato.subtipo || dato.tipo,
-      Programado: totalProgramado,
-      Realizado: totalRealizado
-    };
-  }).filter(Boolean); //Elimina los null
+  // FILTROS y cálculo para ACTIVIDADES
+  const datosActividades = datos
+    .filter(dato => dato.tipo === 'actividad')
+    .filter(dato => !actividadSeleccionada || dato.subtipo === actividadSeleccionada)
+    .map(dato => {
+      const periodosFiltrados = dato.periodos.filter(p => periodoEnRango(p.nombre, periodoActividad));
+      if (periodosFiltrados.length === 0) return null;
+      const totalProgramado = periodosFiltrados.reduce((sum, p) => sum + (Number(p.programado) || 0), 0);
+      const totalRealizado = periodosFiltrados.reduce((sum, p) => sum + (Number(p.realizado) || 0), 0);
+      return {
+        nombre: dato.subtipo || dato.tipo,
+        Programado: totalProgramado,
+        Realizado: totalRealizado,
+      };
+    }).filter(Boolean); //Elimina los null
 
-  const exportarPDF = () => {
-  const input = document.getElementById('grafico');
-  const tipo = filtroTipo || 'Todos';
-  const subtipo = filtroSubtipo || 'Todos';
-  const perido = filtroPeriodo || 'Todos';
+  const exportarPDF = (idGrafico, tituloReporte) => {
+  const input = document.getElementById(idGrafico);
 
   html2canvas(input, { scale: 2 }).then(canvas => {
     const imgData = canvas.toDataURL('image/png');
@@ -100,107 +159,322 @@ const Grafico = ({ tipoFiltro = '', subtipoFiltro = '' }) => {
     // 🔹 Título centrado y más abajo
     pdf.setFontSize(18);
     pdf.setTextColor(40, 40, 40);
-    pdf.text('Reporte de Avance', pageWidth / 2, 35, { align: 'center' });
+    pdf.text(tituloReporte, pageWidth / 2, 35, { align: 'center' });
 
-    // 🔹 Filtros debajo del título
-    pdf.setFontSize(11);
-    pdf.text(`Tipo seleccionado: ${tipo}`, 10, 45);
-    if (filtroSubtipo) {
-      pdf.text(`Subtipo: ${subtipo}`, 10, 52);
-    }
-    pdf.text(`Periodo: ${perido}`, 10, 59);
-
-    // 🔹 Gráfico más abajo
-    const graficoTop = filtroSubtipo ? 60 : 55;
     const imgWidth = 190;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    pdf.addImage(imgData, 'PNG', 10, graficoTop, imgWidth, imgHeight);
+    pdf.addImage(imgData, 'PNG', 10, 50, imgWidth, imgHeight);
 
-    pdf.save('Avance.pdf');
+    pdf.save(`${tituloReporte.replace(/\s+/g, '_')}.pdf`);
   });
 };
 
   return (
     <div>
-      <div className={styles.filtros}>
-        
-        <select value={filtroTipo} onChange={(e) => { setFiltroTipo(e.target.value); setFiltroSubtipo(''); }}>
-          <option value="">Todos</option>
-          <option value="fin">Fin</option>
-          <option value="proposito">Propósito</option>
-          <option value="componente">Componente</option>
-          <option value="actividad">Actividad</option>
-        </select>
 
-        {filtroTipo === 'componente' && (
-          <select value={filtroSubtipo} onChange={(e) => setFiltroSubtipo(e.target.value)}>
-            <option value="">Todos</option>
-            <option value="Componente 1">Componente 1</option>
-            <option value="Componente 2">Componente 2</option>
-            <option value="Componente 3">Componente 3</option>
-            <option value="Componente 4">Componente 4</option>
-            <option value="Componente 5">Componente 5</option>
-          </select>
-        )}
+      {/* === FIN === */}
+      <section>
+        <h2>Fin</h2>
 
-        {filtroTipo === 'actividad' && (
-          <select value={filtroSubtipo} onChange={(e) => setFiltroSubtipo(e.target.value)}>
-            <option value="">Todos</option>
-            <option value="Actividad 1.1">Actividad 1.1</option>
-            <option value="Actividad 1.2">Actividad 1.2</option>
-            <option value="Actividad 1.3">Actividad 1.3</option>
-            <option value="Actividad 2.1">Actividad 2.1</option>
-            <option value="Actividad 2.2">Actividad 2.2</option>
-            <option value="Actividad 2.3">Actividad 2.3</option>
-            <option value="Actividad 3.1">Actividad 3.1</option>
-            <option value="Actividad 3.2">Actividad 3.2</option>
-            <option value="Actividad 3.3">Actividad 3.3</option>
-            <option value="Actividad 4.1">Actividad 4.1</option>
-            <option value="Actividad 4.2">Actividad 4.2</option>
-            <option value="Actividad 4.3">Actividad 4.3</option>
-            <option value="Actividad 5.1">Actividad 5.1</option>
-            <option value="Actividad 5.2">Actividad 5.2</option>
-            <option value="Actividad 5.3">Actividad 5.3</option>
-            {/* Agrega más según necesites */}
-          </select>
-        )}
-
-        {/* NUEVO filtro de periodo */}
-        < select value={filtroPeriodo} onChange={(e) => setFiltroPeriodo(e.target.value)}>
-          <option value="">Todos los periodos</option>
-          <option value="Enero - Abril">Enero - Abril</option>
-          <option value="Mayo - Agosto">Mayo - Agosto</option>
-          <option value="Septiembre - Diciembre">Septiembre - Diciembre</option>
-        </select>
-      </div>
-
-      <div
-        id="grafico"
-        className={styles.contenedorGrafico}
-        style={{ width: '800px', height: '400px' }} // tamaño fijo para mejor captura con html2canvas
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={datosGrafico}
-            margin={{ top: 10, right: 10, left: 10, bottom: 10 }} // Reduce márgenes
+        <div>
+          {periodosOpciones.map(p => (
+            <button
+              key={p}
+              onClick={() => setPeriodoFin(p)}
+              style={{
+                marginRight: 8,
+                backgroundColor: periodoFin === p ? '#660404' : '#ccc',
+                color: periodoFin === p ? '#fff' : '#000',
+                border: 'none',
+                padding: '6px 12px',
+                cursor: 'pointer',
+              }}
+            >
+              {p}
+            </button>
+          ))}
+          <button
+            onClick={() => setPeriodoFin('')}
+            style={{
+              marginRight: 8,
+              backgroundColor: !periodoFin ? '#660404' : '#ccc',
+              color: !periodoFin ? '#fff' : '#000',
+              border: 'none',
+              padding: '6px 12px',
+              cursor: 'pointer',
+            }}
           >
-            {/* <CartesianGrid strokeDasharray="3 3" />   Es para las lineas de de cuadricula */}
-            <XAxis dataKey="nombre" stroke="#ffffff" />
-            <YAxis stroke="#ffffff" />
-            <Tooltip />
-            <Legend verticalAlign="top" height={36} />
-            <Bar dataKey="Programado" fill="#660404">
-              <LabelList dataKey="Programado" position="top" fill="#ffffff" />
-            </Bar>
-            <Bar dataKey="Realizado" fill="#636161">
-              <LabelList dataKey="Realizado" position="top" fill="#ffffff" />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+            Todos
+          </button>
+        </div>
 
-      <button onClick={exportarPDF} className={styles.btnExportar}>Exportar como PDF</button>
+        <div
+          id="graficoFin"
+          className={styles.contenedorGrafico}
+          style={{ width: '800px', height: '350px', marginTop: 20 }}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={datosFin}
+              margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+            >
+              <XAxis dataKey="nombre" stroke="#ffffff" />
+              <YAxis stroke="#ffffff" />
+              <Tooltip />
+              <Legend verticalAlign="top" height={36} />
+              <Bar dataKey="Programado" fill="#660404">
+                <LabelList dataKey="Programado" position="top" fill="#ffffff" />
+              </Bar>
+              <Bar dataKey="Realizado" fill="#636161">
+                <LabelList dataKey="Realizado" position="top" fill="#ffffff" />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <button
+          onClick={() => exportarPDF('graficoFin', 'Reporte Fin')}
+          className={styles.btnExportar}
+          style={{ marginTop: 10 }}
+        >
+          Exportar Fin como PDF
+        </button>
+      </section>
+
+      {/* === PROPÓSITO === */}
+      <section>
+        <h2>Propósito</h2>
+
+        <div>
+          {periodosOpciones.map(p => (
+            <button
+              key={p}
+              onClick={() => setPeriodoProposito(p)}
+              style={{
+                marginRight: 8,
+                backgroundColor: periodoProposito === p ? '#660404' : '#ccc',
+                color: periodoProposito === p ? '#fff' : '#000',
+                border: 'none',
+                padding: '6px 12px',
+                cursor: 'pointer',
+              }}
+            >
+              {p}
+            </button>
+          ))}
+          <button
+            onClick={() => setPeriodoProposito('')}
+            style={{
+              marginRight: 8,
+              backgroundColor: !periodoProposito ? '#660404' : '#ccc',
+              color: !periodoProposito ? '#fff' : '#000',
+              border: 'none',
+              padding: '6px 12px',
+              cursor: 'pointer',
+            }}
+          >
+            Todos
+          </button>
+        </div>
+
+        <div
+          id="graficoProposito"
+          className={styles.contenedorGrafico}
+          style={{ width: '800px', height: '350px', marginTop: 20 }}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={datosProposito}
+              margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+            >
+              <XAxis dataKey="nombre" stroke="#ffffff" />
+              <YAxis stroke="#ffffff" />
+              <Tooltip />
+              <Legend verticalAlign="top" height={36} />
+              <Bar dataKey="Programado" fill="#660404">
+                <LabelList dataKey="Programado" position="top" fill="#ffffff" />
+              </Bar>
+              <Bar dataKey="Realizado" fill="#636161">
+                <LabelList dataKey="Realizado" position="top" fill="#ffffff" />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <button
+          onClick={() => exportarPDF('graficoProposito', 'Reporte Propósito')}
+          className={styles.btnExportar}
+          style={{ marginTop: 10 }}
+        >
+          Exportar Propósito como PDF
+        </button>
+      </section>
+
+      {/* === COMPONENTES === */}
+      <section>
+        <h2>Componentes</h2>
+
+        <select
+          value={componenteSeleccionado}
+          onChange={e => setComponenteSeleccionado(e.target.value)}
+          style={{ marginBottom: 10, padding: 6 }}
+        >
+          <option value="">Todos</option>
+          {componentesOpciones.map(c => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+
+        <div>
+          {periodosOpciones.map(p => (
+            <button
+              key={p}
+              onClick={() => setPeriodoComponente(p)}
+              style={{
+                marginRight: 8,
+                backgroundColor: periodoComponente === p ? '#660404' : '#ccc',
+                color: periodoComponente === p ? '#fff' : '#000',
+                border: 'none',
+                padding: '6px 12px',
+                cursor: 'pointer',
+              }}
+            >
+              {p}
+            </button>
+          ))}
+          <button
+            onClick={() => setPeriodoComponente('')}
+            style={{
+              marginRight: 8,
+              backgroundColor: !periodoComponente ? '#660404' : '#ccc',
+              color: !periodoComponente ? '#fff' : '#000',
+              border: 'none',
+              padding: '6px 12px',
+              cursor: 'pointer',
+            }}
+          >
+            Todos
+          </button>
+        </div>
+
+        <div
+          id="graficoComponentes"
+          className={styles.contenedorGrafico}
+          style={{ width: '800px', height: '350px', marginTop: 20 }}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={datosComponentes}
+              margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+            >
+              <XAxis dataKey="nombre" stroke="#ffffff" />
+              <YAxis stroke="#ffffff" />
+              <Tooltip />
+              <Legend verticalAlign="top" height={36} />
+              <Bar dataKey="Programado" fill="#660404">
+                <LabelList dataKey="Programado" position="top" fill="#ffffff" />
+              </Bar>
+              <Bar dataKey="Realizado" fill="#636161">
+                <LabelList dataKey="Realizado" position="top" fill="#ffffff" />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <button
+          onClick={() => exportarPDF('graficoComponentes', 'Reporte Componentes')}
+          className={styles.btnExportar}
+          style={{ marginTop: 10 }}
+        >
+          Exportar Componentes como PDF
+        </button>
+      </section>
+
+      {/* === ACTIVIDADES === */}
+      <section>
+        <h2>Actividades</h2>
+
+        <select
+          value={actividadSeleccionada}
+          onChange={e => setActividadSeleccionada(e.target.value)}
+          style={{ marginBottom: 10, padding: 6 }}
+        >
+          <option value="">Todos</option>
+          {actividadesOpciones.map(grupo => (
+            <optgroup key={grupo.group} label={`Grupo ${grupo.group}`}>
+              {grupo.items.map(item => (
+                <option key={item} value={item}>{item}</option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+
+        <div>
+          {periodosOpciones.map(p => (
+            <button
+              key={p}
+              onClick={() => setPeriodoActividad(p)}
+              style={{
+                marginRight: 8,
+                backgroundColor: periodoActividad === p ? '#660404' : '#ccc',
+                color: periodoActividad === p ? '#fff' : '#000',
+                border: 'none',
+                padding: '6px 12px',
+                cursor: 'pointer',
+              }}
+            >
+              {p}
+            </button>
+          ))}
+          <button
+            onClick={() => setPeriodoActividad('')}
+            style={{
+              marginRight: 8,
+              backgroundColor: !periodoActividad ? '#660404' : '#ccc',
+              color: !periodoActividad ? '#fff' : '#000',
+              border: 'none',
+              padding: '6px 12px',
+              cursor: 'pointer',
+            }}
+          >
+            Todos
+          </button>
+        </div>
+
+        <div
+          id="graficoActividades"
+          className={styles.contenedorGrafico}
+          style={{ width: '800px', height: '350px', marginTop: 20 }}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={datosActividades}
+              margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+            >
+              <XAxis dataKey="nombre" stroke="#ffffff" />
+              <YAxis stroke="#ffffff" />
+              <Tooltip />
+              <Legend verticalAlign="top" height={36} />
+              <Bar dataKey="Programado" fill="#660404">
+                <LabelList dataKey="Programado" position="top" fill="#ffffff" />
+              </Bar>
+              <Bar dataKey="Realizado" fill="#636161">
+                <LabelList dataKey="Realizado" position="top" fill="#ffffff" />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <button
+          onClick={() => exportarPDF('graficoActividades', 'Reporte Actividades')}
+          className={styles.btnExportar}
+          style={{ marginTop: 10 }}
+        >
+          Exportar Actividades como PDF
+        </button>
+      </section>
+
     </div>
   );
 };
