@@ -1,6 +1,7 @@
 // 🔹 Importaciones
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import Grafico from '../components/Grafico';
 import GestionDatos from '../components/GestionDatos';
 import CargaDeDatos from '../components/CargaDeDatos';
@@ -20,9 +21,9 @@ const Dashboard = () => {
   const [resumen, setResumen] = useState('');
   const [indicador, setIndicador] = useState('');
   const [periodos, setPeriodos] = useState([]);
-  const [forcedPeriods, setForcedPeriods] = useState([]); // periodos habilitados manualmente
+  const [forcedPeriods, setForcedPeriods] = useState([]);
 
-  // 🔹 Obtener periodos globales desde backend
+  // 🔹 Obtener periodos
   useEffect(() => {
     const fetchForcedPeriods = async () => {
       try {
@@ -30,11 +31,10 @@ const Dashboard = () => {
         const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/periods`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
+
         if (res.ok) {
           const data = await res.json();
           setForcedPeriods(data.forcedPeriods || []);
-        } else {
-          console.error('Error al cargar periodos', res.status);
         }
       } catch (error) {
         console.error('Error al cargar periodos:', error);
@@ -43,24 +43,32 @@ const Dashboard = () => {
     fetchForcedPeriods();
   }, []);
 
-  // 🔹 Construir periodos combinando habilitación por mes + forzado global
+  // 🔹 Construir periodos
   useEffect(() => {
-    setPeriodos(periodNames.map((nombre, idx) => ({
-      nombre,
-      programado: '',
-      realizado: '',
-      habilitado: esPeriodoHabilitado(idx) || forcedPeriods.includes(idx)
-    })));
+    setPeriodos(
+      periodNames.map((nombre, idx) => ({
+        nombre,
+        programado: '',
+        realizado: '',
+        habilitado: esPeriodoHabilitado(idx) || forcedPeriods.includes(idx)
+      }))
+    );
   }, [forcedPeriods]);
 
   const handleLogout = () => { logout(); navigate('/login'); };
-  const handleTabChange = (tab) => { setActiveTab(tab); setMenuVisible(false); };
-  const handlePeriodoChange = (index, campo, valor) => {
-    const nuevosPeriodos = [...periodos];
-    nuevosPeriodos[index][campo] = valor;
-    setPeriodos(nuevosPeriodos);
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setMenuVisible(false);
   };
 
+  const handlePeriodoChange = (index, campo, valor) => {
+    const nuevos = [...periodos];
+    nuevos[index][campo] = valor;
+    setPeriodos(nuevos);
+  };
+
+  // 🔹 Guardar datos
   const handleGuardar = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -85,60 +93,39 @@ const Dashboard = () => {
         setSelectedSubType('');
         setResumen('');
         setIndicador('');
-        setPeriodos(periodNames.map((nombre, idx) => ({
-          nombre,
-          programado: '',
-          realizado: '',
-          habilitado: esPeriodoHabilitado(idx) || forcedPeriods.includes(idx)
-        })));
       } else {
-        const errorData = await response.json();
-        console.error(errorData);
         alert('Error al guardar los datos');
       }
     } catch (error) {
-      console.error(error);
       alert('Error de conexión');
     }
   };
 
-  // 🔹 Habilitar o deshabilitar periodo global (SUPER_ADMIN)
+  // 🔹 Habilitar periodo global
   const togglePeriodoGlobal = async (index) => {
     try {
       const token = localStorage.getItem('token');
-      const actualmenteHabilitado = periodos[index].habilitado;
+      const actual = periodos[index].habilitado;
 
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/periods`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/periods`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ index, habilitado: !actualmenteHabilitado })
+        body: JSON.stringify({ index, habilitado: !actual })
       });
 
-      if (!response.ok) {
-        let errorMsg = 'Error desconocido';
-        try {
-          const errorData = await response.json();
-          errorMsg = errorData.message || errorMsg;
-        } catch (e) {
-          errorMsg = response.statusText;
-        }
-        alert('Error al actualizar periodo: ' + errorMsg);
-        return;
+      if (res.ok) {
+        const nuevos = [...periodos];
+        nuevos[index].habilitado = !actual;
+        setPeriodos(nuevos);
+      } else {
+        alert('Error al actualizar periodo');
       }
 
-      const data = await response.json();
-      alert(data.message);
-
-      const nuevosPeriodos = [...periodos];
-      nuevosPeriodos[index].habilitado = !actualmenteHabilitado;
-      setPeriodos(nuevosPeriodos);
-
     } catch (error) {
-      console.error('Error de conexión:', error);
-      alert('Error de conexión con el servidor');
+      alert('Error de conexión');
     }
   };
 
@@ -147,23 +134,33 @@ const Dashboard = () => {
     const role = user?.role || 'USER';
 
     switch (activeTab) {
+
       case 'perfil':
         return (
           <div>
             <h2>Perfil</h2>
             <p>Nombre: {nombre}</p>
             <p>Rol: {role}</p>
-            <button onClick={() => navigate('/cambiar-contrasena')} className={styles.botonSecundario}>
+
+            <button
+              onClick={() => navigate('/cambiar-contrasena')}
+              className={styles.botonSecundario}
+            >
               Cambiar Contraseña
             </button>
-            <button className={`${styles.botonMenu} ${styles.botonSalir}`} onClick={handleLogout}>
+
+            <button onClick={handleLogout} className={`${styles.botonMenu} ${styles.botonSalir}`}>
               Cerrar sesión
             </button>
 
             {role === "SUPER_ADMIN" && (
               <div className={styles.adminPanel}>
                 <h3>Funciones de Super Admin</h3>
-                <button onClick={() => navigate('/admin/usuarios')} className={styles.botonSecundario}>
+
+                <button
+                  onClick={() => navigate('/admin/usuarios')}
+                  className={styles.botonSecundario}
+                >
                   Gestionar Usuarios
                 </button>
 
@@ -177,7 +174,10 @@ const Dashboard = () => {
                   </button>
                 ))}
 
-                <button onClick={() => navigate('/register')} className={styles.botonSecundario}>
+                <button
+                  onClick={() => navigate('/register')}
+                  className={styles.botonSecundario}
+                >
                   Registrar Nuevo Usuario
                 </button>
               </div>
@@ -202,10 +202,17 @@ const Dashboard = () => {
           />
         );
 
-      case 'evidencias': return <Evidencias />;
-      case 'graficos': return <Grafico tipoFiltro={selectedType} subtipoFiltro={selectedSubType} />;
-      case 'edicion': return <GestionDatos />;
-      default: return <p>Selecciona una opción del menú.</p>;
+      case 'evidencias':
+        return <Evidencias />;
+
+      case 'graficos':
+        return <Grafico tipoFiltro={selectedType} subtipoFiltro={selectedSubType} />;
+
+      case 'edicion':
+        return <GestionDatos />;
+
+      default:
+        return <p>Selecciona una opción del menú.</p>;
     }
   };
 
@@ -228,12 +235,12 @@ const Dashboard = () => {
   );
 };
 
-// 🔹 Mantener la lógica original por mes
+// 🔹 Reglas mensuales
 const esPeriodoHabilitado = (index) => {
-  const mesActual = new Date().getMonth() + 1;
-  if (index === 0) return mesActual >= 1 && mesActual <= 4; // Ene-Abr
-  if (index === 1) return mesActual >=5 && mesActual <= 8; // May-Ago
-  if (index === 2) return mesActual >=9 && mesActual <= 12; // Sep-Dic
+  const mes = new Date().getMonth() + 1;
+  if (index === 0) return mes >= 1 && mes <= 4;
+  if (index === 1) return mes >= 5 && mes <= 8;
+  if (index === 2) return mes >= 9 && mes <= 12;
   return false;
 };
 

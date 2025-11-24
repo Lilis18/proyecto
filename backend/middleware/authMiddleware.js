@@ -1,29 +1,34 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secreto123';
+export const protect = async (req, res, next) => {
+  try {
+    let token = req.headers.authorization?.replace("Bearer ", "");
 
-const protect = async (req, res, next) => {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ msg: 'No autorizado - token faltante o malformado' });
+    if (!token) {
+      return res.status(401).json({ msg: "No autorizado - Sin token" });
     }
 
-    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = {
-            id: decoded.id,
-            role: decoded.role,
-        };// para que tu ruta de guardar lo reciba correctamente
-        
-        next();
-    } catch (error) {
-        console.error('Error al verificar token:', error);
-        res.status(401).json({ msg: 'Token inválido' });
+    // SIEMPRE traer al usuario de la BD
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(401).json({ msg: "No autorizado - Usuario no encontrado" });
     }
+
+    // AQUI asocias el usuario real, NO los datos del token
+    req.user = {
+      id: user._id,
+      role: user.role,
+      email: user.email,
+      name: user.name,
+    };
+
+    next();
+  } catch (error) {
+    console.error(error);
+    res.status(401).json({ msg: "Token inválido" });
+  }
 };
-
-module.exports = { protect };

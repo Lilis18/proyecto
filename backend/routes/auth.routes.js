@@ -1,3 +1,5 @@
+console.log("📌 Cargando auth.routes.js");
+
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
@@ -68,7 +70,8 @@ router.post('/login', async (req, res) => {
         if (!isMatch) return res.status(400).json({ msg: 'Contraseña incorrecta' });
 
         const token = jwt.sign(
-            { id: user._id, role: user.role },
+            { id: user._id,
+              role: user.role, },
             JWT_SECRET,
             { expiresIn: '1d' }
         );
@@ -111,29 +114,19 @@ router.put('/cambiar-contrasena', protect, async (req, res) => {
     }
 });
 
-
-// Middleware extra: permitir solo SUPER_ADMIN
 const onlySuperAdmin = async (req, res, next) => {
   try {
-    const user = await User.findById(req.usuarioId);
-    if (!user || user.role !== "SUPER_ADMIN") {
+    // Revisar rol REAL desde req.user (ya viene de la BD)
+    if (req.user.role !== "SUPER_ADMIN") {
       return res.status(403).json({ msg: "No autorizado - Solo SUPER_ADMIN" });
     }
+
     next();
   } catch (error) {
+    console.error(error);
     res.status(500).json({ msg: "Error en validación de permisos" });
   }
 };
-
-// 🔹 Listar todos los usuarios
-router.get("/users", protect, onlySuperAdmin, async (req, res) => {
-  try {
-    const users = await User.find({}, "name email role createdAt");
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ msg: "Error al obtener usuarios" });
-  }
-});
 
 // 🔹 Cambiar rol de usuario
 router.put("/users/:id/role", protect, onlySuperAdmin, async (req, res) => {
@@ -180,5 +173,30 @@ router.put("/periods", protect, onlySuperAdmin, async (req, res) => {
     res.status(500).json({ msg: "Error al actualizar periodos" });
   }
 });
+
+router.get("/super-admin-exists", async (req, res) => {
+  try {
+    const superAdmin = await User.findOne({ role: "SUPER_ADMIN" });
+
+    return res.json({ exists: !!superAdmin });
+  } catch (error) {
+    console.error("Error verificando SUPER_ADMIN:", error);
+    return res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+// Obtener lista de usuarios
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("-password");
+    res.json(users);
+  } catch (error) {
+    console.error("Error al obtener usuarios:", error);
+    res.status(500).json({ msg: "Error al obtener usuarios" });
+  }
+};
+
+// GET /api/auth/users
+router.get("/users", protect, onlySuperAdmin, getAllUsers);
 
 module.exports = router;
