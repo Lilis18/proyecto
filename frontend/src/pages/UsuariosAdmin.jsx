@@ -1,59 +1,59 @@
+// UsuariosAdmin.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import styles from "./UsuariosAdmin.module.css";
 
 const UsuariosAdmin = () => {
   const navigate = useNavigate();
   const [usuarios, setUsuarios] = useState([]);
   const token = localStorage.getItem("token");
 
-  // 🔹 Cargar usuarios
   const cargarUsuarios = async () => {
-  try {
-    const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("token");
 
-    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/users`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/users`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error("Error al cargar usuarios:", data);
+        setUsuarios([]);
+        return;
       }
-    });
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      console.error("Error al cargar usuarios:", data);
+      setUsuarios(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error cargando usuarios:", error);
       setUsuarios([]);
-      return;
     }
-
-    setUsuarios(Array.isArray(data) ? data : []);
-  } catch (error) {
-    console.error("Error cargando usuarios:", error);
-    setUsuarios([]);
-  }
-};
+  };
 
   useEffect(() => {
     cargarUsuarios();
   }, []);
 
-  // 🔹 Cambiar rol
   const cambiarRol = async (id, nuevoRol) => {
     try {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/users/${id}/role`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ role: nuevoRol })
+        body: JSON.stringify({ role: nuevoRol }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
         alert(`Rol actualizado a ${nuevoRol}`);
-        cargarUsuarios(); // refrescar
+        cargarUsuarios();
       } else {
         alert(data.msg || "Error al actualizar rol");
       }
@@ -63,14 +63,13 @@ const UsuariosAdmin = () => {
     }
   };
 
-  // 🔹 Eliminar usuario
   const eliminarUsuario = async (id) => {
     if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
 
     try {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/users/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = await res.json();
@@ -88,12 +87,12 @@ const UsuariosAdmin = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Gestión de Usuarios</h2>
+    <div className={styles.contenedor}>
+      <h2 className={styles.titulo}>Gestión de Usuarios</h2>
 
-      <button onClick={() => navigate("/dashboard")}>Volver</button>
+      <button className={styles.botonVolver} onClick={() => navigate("/dashboard")}>Volver</button>
 
-      <table border="1" cellPadding="8" style={{ marginTop: "20px", width: "100%" }}>
+      <table className={styles.tabla}>
         <thead>
           <tr>
             <th>Nombre</th>
@@ -110,24 +109,23 @@ const UsuariosAdmin = () => {
               <td>{u.email}</td>
               <td>{u.role}</td>
 
-              <td>
-                {/* 🔹 SUPER_ADMIN no puede editarse ni eliminarse */}
+              <td className={styles.acciones}>
                 {u.role !== "SUPER_ADMIN" ? (
                   <>
                     {u.role === "USER" && (
-                      <button onClick={() => cambiarRol(u._id, "ADMIN")}>
+                      <button className={styles.botonAccion} onClick={() => cambiarRol(u._id, "ADMIN")}>
                         Convertir en ADMIN
                       </button>
                     )}
 
                     {u.role === "ADMIN" && (
-                      <button onClick={() => cambiarRol(u._id, "USER")}>
+                      <button className={styles.botonAccion} onClick={() => cambiarRol(u._id, "USER")}>
                         Convertir en USER
                       </button>
                     )}
 
                     <button
-                      style={{ marginLeft: "10px", color: "red" }}
+                      className={styles.botonEliminar}
                       onClick={() => eliminarUsuario(u._id)}
                     >
                       Eliminar

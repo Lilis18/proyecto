@@ -1,0 +1,108 @@
+/* ---------------- UsuariosAdmin.module.css ---------------- */
+
+/* Contenedor general */
+.contenedor {
+  width: 100%;
+  min-height: 100vh;
+  background: rgba(0, 0, 0, 0.30);
+  backdrop-filter: blur(10px);
+  padding: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  color: white;
+}
+
+.titulo {
+  font-size: 26px;
+  margin-bottom: 15px;
+  color: #ffffff;
+}
+
+.botonVolver {
+  background: transparent;
+  border: 2px solid darkred;
+  padding: 10px 18px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: 0.2s;
+}
+
+.botonVolver:hover {
+  background-color: darkred;
+}
+
+/* Tabla */
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.tabla th {
+  background-color: #c0c0c0;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+}
+
+.tabla td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Acciones */
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.botonAccion {
+  background: #900000;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.botonAccion:hover {
+  background-color: #b30000;
+}
+
+.botonEliminar {
+  background: transparent;
+  border: 2px solid #ff4444;
+  color: #ff7777;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.botonEliminar:hover {
+  background: #ff4444;
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tabla th,
+  .tabla td {
+    padding: 6px;
+    font-size: 13px;
+  }
+
+  .acciones {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

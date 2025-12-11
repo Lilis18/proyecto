@@ -23,11 +23,19 @@ const Register = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('token', data.token);
-        navigate('/login');
-      } else {
-        setError(data.msg || 'Error al registrarse');
+        // Si el usuario actual YA está logueado (SUPER_ADMIN)
+        const tokenExistente = localStorage.getItem('token');
+      if (tokenExistente) {
+        // NO reemplazar token
+        setError('');
+        alert('Usuario registrado correctamente');
+        return; // SE QUEDA en el dashboard
       }
+      // Si NO hay usuario autenticado (primer registro)
+      localStorage.setItem('token', data.token);
+      navigate('/login');
+    }
+
     } catch (error) {
       console.error(error);
       setError('Error de conexión');

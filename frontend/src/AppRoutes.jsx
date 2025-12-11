@@ -1,4 +1,3 @@
-// AppRoutes.jsx
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
@@ -7,6 +6,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import UsuariosAdmin from "./pages/UsuariosAdmin";
 import CambiarContrasena from './pages/CambiarContrasena';
+import EvidenciasFormato from "./components/Evidencias";   // 🔹 IMPORTANTE
 
 function AppRoutes({ isAuthenticated, setIsAuthenticated }) {
   const location = useLocation();
@@ -22,7 +22,8 @@ function AppRoutes({ isAuthenticated, setIsAuthenticated }) {
         <Route path="/register" element={<Register />} />
         <Route path="/cambiar-contrasena" element={<CambiarContrasena />} />
 
-        {/* 🔹 Rutas protegidas */}
+        {/* ---------- RUTAS PROTEGIDAS ---------- */}
+
         <Route
           path="/dashboard"
           element={
@@ -34,6 +35,14 @@ function AppRoutes({ isAuthenticated, setIsAuthenticated }) {
           path="/admin/usuarios"
           element={
             isAuthenticated ? <UsuariosAdmin /> : <Navigate to="/login" replace />
+          }
+        />
+
+        {/* 🔥 ESTA ES LA RUTA QUE TE FALTABA */}
+        <Route
+          path="/evidencias/:id"
+          element={
+            isAuthenticated ? <EvidenciasFormato /> : <Navigate to="/login" replace />
           }
         />
 

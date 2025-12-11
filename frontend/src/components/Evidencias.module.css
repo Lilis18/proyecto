@@ -19,6 +19,8 @@
   display: block;
   font-weight: bold;
   margin-bottom: 5px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .campo input,
@@ -27,6 +29,9 @@
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  resize: vertical;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Tabla */
@@ -35,16 +40,19 @@
   border-collapse: collapse;
   text-align: center;
   margin-bottom: 20px;
+  table-layout: fixed; /* evita deformaciones */
 }
 
 .tabla th,
 .tabla td {
   border: 1px solid #ccc;
   padding: 5px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .tabla thead {
-  background-color: #e2e2e2;
+  background-color: #686868;
 }
 
 .tabla .filaTitulo {
@@ -58,14 +66,16 @@
   border: 1px solid #ccc;
   padding: 5px;
   margin-bottom: 45px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Documento generado */
 .documento {
   font-family: Arial;
   padding: 20px;
-  background-color: #fff;
-  color: #000;
+  background-color: #ffffff;
+  color: #000000;
   width: 60%;
   margin: auto;
 }
@@ -76,11 +86,11 @@
 }
 
 .membreteImg {
-  width: 400px;       /* Ajusta el ancho según lo que necesites */
-  height: auto;       /* Mantiene la proporción original */
-  max-height: 100px;   /* Limita la altura si es necesario */
+  width: 400px;
+  height: auto;
+  max-height: 100px;
   object-fit: contain;
-} 
+}
 
 .textoCentrado {
   text-align: center;
@@ -105,21 +115,25 @@
   background-color: #870c0c;
 }
 
+/* Filas dobles */
 .filaDoble {
   display: flex;
   justify-content: space-between;
   gap: 2rem;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap; /* Para responsividad */
 }
 
 .columna {
   flex: 1;
+  min-width: 250px;
 }
 
 .columna label {
   display: block;
   margin-bottom: 0.3rem;
   font-weight: 500;
+  word-wrap: break-word;
 }
 
 .columna input {
@@ -128,8 +142,10 @@
   font-size: 0.95rem;
   border: 1px solid #ccc;
   border-radius: 4px;
+  word-wrap: break-word;
 }
 
+/* Encabezado con grid */
 .gridEncabezado {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -145,6 +161,7 @@
   display: block;
   margin-bottom: 0.3rem;
   font-weight: 500;
+  word-wrap: break-word;
 }
 
 .columnaEncabezado input {
@@ -157,4 +174,56 @@
 
 .columnaCompleta {
   grid-column: span 3;
+}
+
+/* Ajuste texto celdas */
+.celdaTexto {
+  padding: 10px;
+  font-size: 14px;
+  text-align: justify;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.celdaTexto ul,
+.celdaTexto ol {
+  padding-left: 20px;
+  margin: 0;
+}
+
+/* Firma */
+.firmaImg {
+  width: 70px;
+  height: auto;
+  display: block;
+  margin: 5px auto;
+  object-fit: contain;
+}
+
+/* Texto negro en impresión */
+.documento,
+.documento * {
+  color: #000000 !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+/* Fondo gris encabezados */
+.documento table th {
+  background-color: #c0c0c0 !important;
+  color: #fff !important;
+}
+
+/* Responsividad general */
+@media (max-width: 900px) {
+  .documento {
+    width: 90%;
+  }
+  .gridEncabezado {
+    grid-template-columns: 1fr;
+  }
+  .columnaCompleta {
+    grid-column: span 1;
+  }
 }

@@ -167,7 +167,7 @@ const Grafico = () => {
       const logoImg = await fetch(logoUrl)
         .then((res) => res.blob())
         .then((blob) => URL.createObjectURL(blob));
-      pdf.addImage(logoImg, "PNG", 10, 5, 25, 20); // medidas originales
+      pdf.addImage(logoImg, "PNG", 10, 5, 100, 20); // medidas originales
 
       // === Título ===
       pdf.setFontSize(16);

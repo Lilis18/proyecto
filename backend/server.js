@@ -4,12 +4,13 @@ const cors = require('cors');
 const dataRoutes = require('./routes/data');
 const authRoutes = require('./routes/auth.routes');
 const subtiposRoutes = require('./routes/subtipos');
-const periodosRoutes = require('./routes/periodosRoutes');
+const periodosRoutes = require('./routes/periodosRoutes')
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Conectado a MongoDB'))

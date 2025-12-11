@@ -1,4 +1,3 @@
-// 🔹 Importaciones
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,6 +13,7 @@ const periodNames = ['Enero - Abril', 'Mayo - Agosto', 'Septiembre - Diciembre']
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+
   const [activeTab, setActiveTab] = useState('perfil');
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedType, setSelectedType] = useState('');
@@ -23,13 +23,13 @@ const Dashboard = () => {
   const [periodos, setPeriodos] = useState([]);
   const [forcedPeriods, setForcedPeriods] = useState([]);
 
-  // 🔹 Obtener periodos
+  // Obtener periodos desde backend
   useEffect(() => {
     const fetchForcedPeriods = async () => {
       try {
         const token = localStorage.getItem('token');
         const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/periods`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` }
         });
 
         if (res.ok) {
@@ -43,7 +43,7 @@ const Dashboard = () => {
     fetchForcedPeriods();
   }, []);
 
-  // 🔹 Construir periodos
+  // Construcción de periodos con habilitación
   useEffect(() => {
     setPeriodos(
       periodNames.map((nombre, idx) => ({
@@ -56,11 +56,7 @@ const Dashboard = () => {
   }, [forcedPeriods]);
 
   const handleLogout = () => { logout(); navigate('/login'); };
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setMenuVisible(false);
-  };
+  const handleTabChange = (tab) => { setActiveTab(tab); setMenuVisible(false); };
 
   const handlePeriodoChange = (index, campo, valor) => {
     const nuevos = [...periodos];
@@ -68,7 +64,7 @@ const Dashboard = () => {
     setPeriodos(nuevos);
   };
 
-  // 🔹 Guardar datos
+  // Guardar datos
   const handleGuardar = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -76,7 +72,7 @@ const Dashboard = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
           tipo: selectedType,
@@ -93,15 +89,14 @@ const Dashboard = () => {
         setSelectedSubType('');
         setResumen('');
         setIndicador('');
-      } else {
-        alert('Error al guardar los datos');
-      }
+      } else alert('Error al guardar los datos');
+
     } catch (error) {
       alert('Error de conexión');
     }
   };
 
-  // 🔹 Habilitar periodo global
+  // Habilitar / Deshabilitar periodo global
   const togglePeriodoGlobal = async (index) => {
     try {
       const token = localStorage.getItem('token');
@@ -111,7 +106,7 @@ const Dashboard = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ index, habilitado: !actual })
       });
@@ -120,21 +115,19 @@ const Dashboard = () => {
         const nuevos = [...periodos];
         nuevos[index].habilitado = !actual;
         setPeriodos(nuevos);
-      } else {
-        alert('Error al actualizar periodo');
-      }
+      } else alert('Error al actualizar periodo');
 
     } catch (error) {
       alert('Error de conexión');
     }
   };
 
+  // Renderizado dinámico
   const renderContent = () => {
     const nombre = user?.nombre || 'Desconocido';
     const role = user?.role || 'USER';
 
     switch (activeTab) {
-
       case 'perfil':
         return (
           <div>
@@ -142,44 +135,24 @@ const Dashboard = () => {
             <p>Nombre: {nombre}</p>
             <p>Rol: {role}</p>
 
-            <button
-              onClick={() => navigate('/cambiar-contrasena')}
-              className={styles.botonSecundario}
-            >
-              Cambiar Contraseña
-            </button>
+            <button onClick={() => navigate('/cambiar-contrasena')} className={styles.botonSecundario}>Cambiar Contraseña</button>
+            <button onClick={handleLogout} className={`${styles.botonMenu} ${styles.botonSalir}`}>Cerrar sesión</button>
 
-            <button onClick={handleLogout} className={`${styles.botonMenu} ${styles.botonSalir}`}>
-              Cerrar sesión
-            </button>
-
-            {role === "SUPER_ADMIN" && (
+            {(role === 'SUPER_ADMIN' || role === 'ADMIN') && (
               <div className={styles.adminPanel}>
-                <h3>Funciones de Super Admin</h3>
+                <h3>Panel Administrativo</h3>
 
-                <button
-                  onClick={() => navigate('/admin/usuarios')}
-                  className={styles.botonSecundario}
-                >
-                  Gestionar Usuarios
-                </button>
+                {role === 'SUPER_ADMIN' && (
+                  <button onClick={() => navigate('/admin/usuarios')} className={styles.botonSecundario}>Gestionar Usuarios</button>
+                )}
 
                 {periodos.map((p, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => togglePeriodoGlobal(idx)}
-                    className={styles.botonSecundario}
-                  >
+                  <button key={idx} onClick={() => togglePeriodoGlobal(idx)} className={styles.botonSecundario}>
                     {p.habilitado ? `Deshabilitar ${p.nombre}` : `Habilitar ${p.nombre}`}
                   </button>
                 ))}
 
-                <button
-                  onClick={() => navigate('/register')}
-                  className={styles.botonSecundario}
-                >
-                  Registrar Nuevo Usuario
-                </button>
+                <button onClick={() => navigate('/register')} className={styles.botonSecundario}>Registrar Nuevo Usuario</button>
               </div>
             )}
           </div>
@@ -202,17 +175,10 @@ const Dashboard = () => {
           />
         );
 
-      case 'evidencias':
-        return <Evidencias />;
-
-      case 'graficos':
-        return <Grafico tipoFiltro={selectedType} subtipoFiltro={selectedSubType} />;
-
-      case 'edicion':
-        return <GestionDatos />;
-
-      default:
-        return <p>Selecciona una opción del menú.</p>;
+      case 'evidencias': return <Evidencias />;
+      case 'graficos': return <Grafico tipoFiltro={selectedType} subtipoFiltro={selectedSubType} />;
+      case 'edicion': return <GestionDatos />;
+      default: return <p>Selecciona una opción del menú.</p>;
     }
   };
 
@@ -235,7 +201,7 @@ const Dashboard = () => {
   );
 };
 
-// 🔹 Reglas mensuales
+// Regla mensual por periodo
 const esPeriodoHabilitado = (index) => {
   const mes = new Date().getMonth() + 1;
   if (index === 0) return mes >= 1 && mes <= 4;
